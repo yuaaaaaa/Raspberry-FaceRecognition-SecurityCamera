@@ -40,4 +40,29 @@ ls -al /dev/ | grep video
 ```
 
 ### 3、测试相机
+#### 现在让我们用树莓派拍一张照片吧~
+```python
+// 拍摄一张照片 并命名为image.jpg存到本地
+raspistill -o image.jpg
+```
+#### 现在让我们用一段简单的代码测试一下吧
+首先打开你的树莓派编译器，然后输入以下代码
+```py
+import cv2
+cap = cv2.VideoCapture(0)
+# 设置窗口的宽和高
+cap.set(3,640)
+cap.set(4,480)
+while(True):
+    ret, frame = cap.read()
+    if ret:
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        cv2.imshow('frame', frame)
+        cv2.imshow('gray', gray)
+        k = cv2.waitKey(30) & 0xff
+    if k == 27: # press 'ESC' to quit
+        break
+cap.release()
+cv2.destroyAllWindows()
+```
 ### 4、pass
