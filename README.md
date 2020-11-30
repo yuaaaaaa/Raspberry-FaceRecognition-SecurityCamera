@@ -370,6 +370,25 @@ def sendEmail(msg):
 msg = setMsg()
 sendEmail(msg)
 ```
+
+**效果渲染**
+
+```邮件接收```
+
+![邮件接收](README_files/2.png)
+
+```不属于家庭成员情况```
+
+![不属于家庭成员情况](README_files/3.png)
+
+```属于家庭成员情况```
+
+![属于家庭成员情况](README_files/4.png)
+
+```确认为家庭成员```
+
+![确认为家庭成员](README_files/6.png)
+
 ### step9-CNN神经网络
 [代码仓库](https://github.com/yuaaaaaa/Raspberry-FaceRecognition-SecurityCamera/blob/main/Project/%E9%99%88%E9%9B%A8%E6%99%B4/model.py)
 
