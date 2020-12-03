@@ -4,25 +4,29 @@ Created on Wed Dec  2 16:02:04 2020
 
 @author: Administrator
 """
-
+# -*- coding: utf-8 -*-
 
 import io
-import time
+from time import sleep
 import picamera
-import cv2
 import numpy as np
+import cv2
 
-# creat a stream
-stream = io.BytesIO()
 with picamera.PiCamera() as camera:
-    camera.start_preview()
-    time.sleep(2)
-    camera.capture(stream, format='jpeg')
-# create numpy
-data = np.fromstring(stream.getvalue(), dtype=np.uint8)
-# recode from numpy to opencv
-image = cv2.imdecode(data, 1)
-# return rgb picture
-image = image[:, :, ::-1]
-cv2.imshow(image)
-print('ok')
+    camera.resolution = (320, 240)
+    sleep(1)
+    
+    stream = io.BytesIO()
+    for foo in camera.capture_continuous(stream, format='jpeg', use_video_port=True):
+        data = np.fromstring(stream.getvalue(), dtype=np.uint8)
+        image = cv2.imdecode(data, cv2.CV_LOAD_IMAGE_UNCHANGED)
+
+        cv2.imshow("img", image)
+        cv2.waitKey(1)
+
+        # Truncate the stream to the current position (in case
+        # prior iterations output a longer image)
+        stream.truncate()
+        stream.seek(0)
+
+
