@@ -1,5 +1,7 @@
 # -树莓派智能安防摄像头（Smart security camera for home use by Raspberry-Pi）
 ![树莓派](README_files/2.jpg)
+## -目录（Catalogue）
+[TOC]
 ## -描述（Description）
 		RPi-AI-Camera是一款智能AI摄像头，具有人形侦查预警器。
 		通过识别移动的物体，抓取人脸图像对比家庭成员信息来判别出外人入侵的情况，从而做到邮件预警的功能
@@ -41,17 +43,17 @@ ls -al /dev/ | grep video
 ```
 
 ### step3-测试相机（To test the camera）
-#### 现在让我们用树莓派拍一张照片吧~
+#### 1) 现在让我们用树莓派拍一张照片吧~
 ```
 // 拍摄一张照片 并命名为image.jpg存到本地
 raspistill -o image.jpg
 ```
-#### 现在让我们用一段简单的代码测试一下吧
+#### 2) 现在让我们用一段简单的代码测试一下吧
 首先打开你的树莓派编译器，然后输入以下代码
 ```py
 import cv2
 cap = cv2.VideoCapture(0)
-# 设置窗口的宽和高
+// 设置窗口的宽和高
 cap.set(3,640)
 cap.set(4,480)
 while(True):
@@ -72,7 +74,6 @@ cv2.destroyAllWindows()
 ### step4-移动物体目标检测（Moving object detection）
 [代码仓库地址](https://github.com/yuaaaaaa/RPi-AI-CAMERA/blob/main/Project/%E9%99%88%E9%9B%A8%E6%99%B4/%E8%BF%90%E5%8A%A8%E7%89%A9%E4%BD%93%E6%A3%80%E6%B5%8B%E6%A1%86%E9%80%89.ipynb)
 ```python
-# -*- coding: utf-8 -*-
 """
 Created on Wed Nov 25 14:21:53 2020
 
@@ -81,7 +82,6 @@ Created on Wed Nov 25 14:21:53 2020
 
 import cv2
 import numpy as np
-# import face_recognition
 import os
 path = "C://Users//Administrator//Desktop//项目实训//face_image"  # 模型数据图片目录
 cap = cv2.VideoCapture(0)
@@ -132,7 +132,6 @@ if cap.isOpened():
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
             if(flag):
                 flag = 0
-                # discern(framev)
             
         cv2.putText(frame, "F{}".format(frame), (20, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
         
@@ -171,9 +170,7 @@ cv2.destroyAllWindows()
 ```python
 import cv2
 
-
-# 图片识别方法封装
-def discern(img):
+def discern(img): # 图片识别方法封装
     pathf = '/Users/chenyuqing/opencv/data/haarcascades/haarcascade_frontalface_default.xml'
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     face_cascade = cv2.CascadeClassifier(pathf)
@@ -185,11 +182,9 @@ def discern(img):
     cv2.imshow("Image", img)
 
 
-# 获取摄像头0表示第一个摄像头
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(0)  # 获取摄像头0表示第一个摄像头
 while (1):  # 逐帧显示
     ret, img = cap.read()
-    # cv2.imshow("Image", img)
     discern(img)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
@@ -227,30 +222,25 @@ for fn in os.listdir(path):  #fn 表示的是文件名q
     total_image_name.append(fn)  #图片名字列表
 while (1):
     ret, frame = cap.read()
-    # 发现在视频帧所有的脸和face_enqcodings
-    face_locations = face_recognition.face_locations(frame)
+    face_locations = face_recognition.face_locations(frame) # 发现在视频帧所有的脸和face_enqcodings
     face_encodings = face_recognition.face_encodings(frame, face_locations)
-    # 在这个视频帧中循环遍历每个人脸
     for (top, right, bottom, left), face_encoding in zip(
-            face_locations, face_encodings):
-        # 看看面部是否与已知人脸相匹配。
-        for i, v in enumerate(total_face_encoding):
+            face_locations, face_encodings):     # 在这个视频帧中循环遍历每个人脸
+        for i, v in enumerate(total_face_encoding):        # 看看面部是否与已知人脸相匹配。
             match = face_recognition.compare_faces(
                 [v], face_encoding, tolerance=0.5)
             name = "Unknown"
             if match[0]:
                 name = total_image_name[i]
                 break
-        # 画出一个框，框住脸
-        cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
-        # 画出一个带名字的标签，放在框下
+
+        cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)         # 画出一个框，框住脸
         cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255),
-                      cv2.FILLED)
+                      cv2.FILLED)        # 画出一个带名字的标签，放在框下
         font = cv2.FONT_HERSHEY_DUPLEX
         cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0,
                     (255, 255, 255), 1)
-    # 显示结果图像
-    cv2.imshow('Video', frame)
+    cv2.imshow('Video', frame)     # 显示结果图像
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
@@ -262,7 +252,7 @@ cv2.destroyAllWindows()
 
 Face_Recognition人脸识别模型是一个具有29个转换层的ResNet(残差网络)。
 
-### step7-定时录像
+### step7-定时录像（Regular mail）
 [代码仓库地址](https://github.com/yuaaaaaa/RPi-AI-CAMERA/blob/main/Project/%E8%AE%B8%E4%BA%A6%E6%9D%A8/%E5%AE%9E%E7%8E%B0%E5%BD%95%E5%83%8F.ipynb)
 ```python
 import cv2
@@ -305,10 +295,9 @@ cv2.destroyAllWindows()
 
 当画面静止时间超过6s时，该摄像系统将不再录像记录，以达到节省本地内存的优点
 
-### step8-非家庭成员入侵发邮件报警
+### step8-非家庭成员入侵发邮件报警（Stanger call the police）
 [代码仓库地址](https://github.com/yuaaaaaa/RPi-AI-CAMERA/blob/main/Project/%E8%AE%B8%E4%BA%A6%E6%9D%A8/%E9%82%AE%E4%BB%B6%E5%8F%91%E9%80%81%EF%BC%88%E6%91%84%E5%83%8F%E5%A4%B4%E6%8B%8D%E6%91%84%E7%85%A7%E7%89%87%E5%8F%91%E9%80%81%EF%BC%89.ipynb)
 ```python
-# -*- coding: utf-8 -*-
 """
 Created on Sun Nov 29 17:16:14 2020
 
@@ -338,29 +327,25 @@ path        = os.getcwd()             #获取图片保存路径
 '''
 
 #构造邮件内容：
-def setMsg():
-    # 下面依次为邮件类型，主题，发件人和收件人。
-    msg = MIMEMultipart('mixed')
+def setMsg():     # 下面依次为邮件类型，主题，发件人和收件人。
+    msg = MIMEMultipart('mixed') 
     msg['Subject'] = '出现非家庭成员！'
     msg['From'] = '3299115821@qq.com <3299115821@qq.com>'
     msg['To'] = addressee
 
-    # 下面为邮件的正文
-    text = "主人，出现非家庭成员！照片如下！"
+    text = "主人，出现非家庭成员！照片如下！"     # 下面为邮件的正文
     text_plain = MIMEText(text, 'plain', 'utf-8')
     msg.attach(text_plain)
 
-    # 构造图片链接
-    sendimagefile = open(path+'/person.jpg', 'rb').read()
+    sendimagefile = open(path+'/person.jpg', 'rb').read()     # 构造图片链接
     image = MIMEImage(sendimagefile)
-    # 下面一句将收件人看到的附件照片名称改为people.png。
-    image["Content-Disposition"] = 'attachment; filename="people.png"'
+    image["Content-Disposition"] = 'attachment; filename="people.png"'     # 下面一句将收件人看到的附件照片名称改为people.png。
     msg.attach(image)
     return msg.as_string()
 
 #实现邮件发送：
 def sendEmail(msg):
-    # 发送邮件
+    #发送邮件
     smtp = smtplib.SMTP()
     smtp.connect('smtp.qq.com')
     smtp.login(username, password)
@@ -389,7 +374,7 @@ sendEmail(msg)
 
 ![确认为家庭成员](README_files/6.png)
 
-### step9-CNN神经网络
+### step9-CNN神经网络（CNNNET）
 [代码仓库](https://github.com/yuaaaaaa/Raspberry-FaceRecognition-SecurityCamera/blob/main/Project/%E9%99%88%E9%9B%A8%E6%99%B4/model.py)
 
 ```python
@@ -449,7 +434,7 @@ class DataSet(object):
         X_train,X_test,y_train,y_test = train_test_split(imgs,labels,test_size=0.2,random_state=random.randint(0, 100))
 
         #重新格式化和标准化
-        # 本案例是基于thano的，如果基于tensorflow的backend需要进行修改
+        #本案例是基于thano的，如果基于tensorflow的backend需要进行修改
         print(X_train.shape)
         X_train = X_train.reshape(X_train.shape[0], 1, self.img_size, self.img_size)/255.0
         X_test = X_test.reshape(X_test.shape[0], 1, self.img_size, self.img_size) / 255.0
@@ -571,3 +556,30 @@ if __name__ == '__main__':
 **tips:**
 ![卷积神经网络](README_files/1.png)
 * 基于卷积神经网络完成人脸识别
+
+## -性能描述
+### 1）关于移动物体识别
+对于每一帧 计算得到： 
+每处理一帧像素并进行计算 计算机 需要使用```31.26933333333333```毫秒
+每处理一帧像素并进行计算 树莓派 需要使用```93.80799999999999```毫秒
+
+### 2）对于人脸识别
+对于每一帧 计算得到： 
+
+每处理一帧像素并进行计算 笔记本 需要使用```49.980711323233333```毫秒
+
+每处理一帧像素并进行计算 树莓派 需要使用```149.94213487503316```毫秒
+
+### 3）对于邮件发送
+对于一封邮件 计算得到：
+
+每发送一封邮件 笔记本 需要使用```1564.6496629999547```毫秒
+
+每发送一封邮件 树莓派 需要使用```1428.1979999999996```毫秒
+
+### 4）对于定时录像
+对于每一次启动该程序
+
+每完整的启动一次该程序 计算机 需要```3732.4840199999016```毫秒
+
+每完整的启动一次该程序 树莓派 需要```22.181```毫秒
