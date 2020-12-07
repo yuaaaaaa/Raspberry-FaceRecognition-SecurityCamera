@@ -1,0 +1,30 @@
+<RCC>
+  <qresource>
+    <file>线性太阳.svg</file>
+    <file>线性消息.svg</file>
+    <file>线性分类.svg</file>
+    <file>线性三横.svg</file>
+    <file>线性照像机.svg</file>
+    <file>线性信号.svg</file>
+    <file>线性圆形摄像头.svg</file>
+    <file>线性显示屏.svg</file>
+    <file>头像.png</file>
+    <file>面性地球图标2.svg</file>
+    <file>面性圆图标.svg</file>
+    <file>面性闹铃图标.svg</file>
+    <file>面性盒子图标.svg</file>
+    <file>面性金币图标.svg</file>
+    <file>图.png</file>
+    <file>海.jpg</file>
+    <file>线性磁带.svg</file>
+    <file>线性摄像机.svg</file>
+    <file>线性耳机.svg</file>
+    <file>头像.jpg</file>
+    <file>线性蓝牙.svg</file>
+    <file>线性设备WiFi.svg</file>
+    <file>线性wifi.svg</file>
+    <file>线性电量.svg</file>
+    <file>signal.png</file>
+    <file>signal.svg</file>
+  </qresource>
+</RCC>
