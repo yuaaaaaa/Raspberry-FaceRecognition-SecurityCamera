@@ -10,7 +10,6 @@ from tensorflow.keras.layers import Permute
 from tensorflow.keras.layers import PReLU
 from tensorflow.keras.models import Model, Sequential
 import tensorflow.compat.v1 as tf
-tf.disable_v2_behavior()
 import numpy as np 
 import utils.utils as utils
 import cv2
