@@ -74,84 +74,8 @@ cv2.destroyAllWindows()
 ![效果示意图](README_files/1.jpg)
 ### step4-移动物体目标检测（Moving object detection）
 [代码仓库地址](https://github.com/yuaaaaaa/RPi-AI-CAMERA/blob/main/Project/%E9%99%88%E9%9B%A8%E6%99%B4/%E8%BF%90%E5%8A%A8%E7%89%A9%E4%BD%93%E6%A3%80%E6%B5%8B%E6%A1%86%E9%80%89.ipynb)
-```python
-"""
-Created on Wed Nov 25 14:21:53 2020
+![原理](README_files/moving.jpg)
 
-@author: Administrator
-"""
-
-import cv2
-import numpy as np
-import os
-path = "C://Users//Administrator//Desktop//项目实训//face_image"  # 模型数据图片目录
-cap = cv2.VideoCapture(0)
-total_image_name = []
-total_face_encoding = []
-for fn in os.listdir(path):  #fn 表示的是文件名q
-    print(path + "/" + fn)
-    fn = fn[:(len(fn) - 4)]  #截取图片名（这里应该把images文件中的图片名命名为为人物名）
-    total_image_name.append(fn)  #图片名字列表
-
-#读取视频流
-cap = cv2.VideoCapture(0)
-firstFrame = None
-countflag = 0
-
-if cap.isOpened():
-    while(True):
-        print('camera open')
-        f1 = open('test.txt','w')
-        f1.write('hello boy!')
-        countflag += 1
-        ret, frame = cap.read()
-        #没有抓到第一帧那么说明到了视频结尾
-        if not ret:
-            break
-        #调整帧的大小，转换为灰度图像进行高斯模糊
-        framev = cv2.resize(frame, (640, 360))
-        frame = cv2.resize(frame, (640, 360), interpolation=cv2.INTER_CUBIC)
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        gray = cv2.GaussianBlur(gray, (21, 21), 0)
-        #如果第一帧是None， 对其初始化
-        if firstFrame is None:
-            firstFrame = gray
-            continue
-        #计算当前帧与第一帧的不同
-        frameDelta = cv2.absdiff(firstFrame, gray)
-        thresh = cv2.threshold(frameDelta, 25, 255, cv2.THRESH_BINARY)[1]
-        #扩展阀值图像填充孔洞
-        thresh = cv2.dilate(thresh, None, iterations=3)
-        contours, hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        #遍历轮廓
-        flag = 1
-        for contour in contours:
-            if cv2.contourArea(contour) < 1000: #面积阈值
-                continue
-            #计算最小外接矩形
-            x, y, w, h = cv2.boundingRect(contour)
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            if(flag):
-                flag = 0
-            
-        cv2.putText(frame, "F{}".format(frame), (20, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-        
-        cv2.imshow('frame_with_result', frame)
-        cv2.imshow('thresh', thresh)
-        cv2.imshow('frameDiff', frameDelta)
-        if(countflag == 50):
-            countflag = 0
-            firstFrame = gray
-        #处理按键效果
-        key = cv2.waitKey(60) & 0xff
-        if key == 27:
-            break
-        elif key == ord(' '):
-            cv2.waitKey(0)
-        
-    cap.release()
-cv2.destroyAllWindows()
-```
 **tips：**
  * 高斯模糊
 
@@ -166,88 +90,17 @@ cv2.destroyAllWindows()
 还需要应用阈值来得到一幅黑白图像，并通过下面代码来膨胀（dilate）图像，
 从而对孔（hole）和缺陷（imperfection）进行归一化处理。
 
-### step5-人脸检测（Face Detection）
+### step5-人脸检测（MTCNN）
 [代码仓库地址](https://github.com/yuaaaaaa/RPi-AI-CAMERA/blob/main/Project/%E9%99%88%E9%9B%A8%E6%99%B4/%E5%9B%BE%E5%83%8F%E4%BA%BA%E8%84%B8%E6%A1%86%E9%80%89.ipynb)
-```python
-import cv2
 
-def discern(img): # 图片识别方法封装
-    pathf = '/Users/chenyuqing/opencv/data/haarcascades/haarcascade_frontalface_default.xml'
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    face_cascade = cv2.CascadeClassifier(pathf)
-    faceRects = face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=3, minSize=(50, 50))
-    if len(faceRects):
-        for faceRect in faceRects:
-            x, y, w, h = faceRect
-            cv2.rectangle(img, (x, y), (x + h, y + w), (0, 255, 0), 2)  # 框出人脸
-    cv2.imshow("Image", img)
-
-
-cap = cv2.VideoCapture(0)  # 获取摄像头0表示第一个摄像头
-while (1):  # 逐帧显示
-    ret, img = cap.read()
-    discern(img)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-cap.release()  # 释放摄像头
-cv2.destroyAllWindows()  # 释放窗口资源
-
-```
-**tips:**
-* 人脸检测
-
-人脸识别最基本的任务当然是“人脸检测”。与将来拍摄的新面孔相比，您必须先“捕捉”面孔以识别它。
-最常用的当然是Haar（哈尔）分类器，Haar（哈尔）分类器：Haar(哈尔)特征分为以下几类类：边缘特征、线性特征、中心特征和对角线特征，组合成特征模板。
-特别的，OpenCV自带了训练器和检测器（Cascade Classifier Training），该XML文件，就是OpenCV自带的检测器。
+![原理](README_files/detect.jpg)
 
 ### step6-人脸识别（Face Recognition）
 [数据集](https://github.com/polarisZhao/awesome-face)
 
 [代码仓库地址](https://github.com/yuaaaaaa/RPi-AI-CAMERA/blob/main/Project/%E9%99%88%E9%9B%A8%E6%99%B4/%E5%9B%BE%E5%83%8F%E4%BA%BA%E8%84%B8%E6%A3%80%E6%B5%8B.ipynb)
-```python
-#人脸识别类 - 使用face_recognition模块
-import cv2
-import face_recognition
-import os
 
-path = "/Users/chenyuqing/Desktop/face_image "  # 模型数据图片目录
-cap = cv2.VideoCapture(0)
-total_image_name = []
-total_face_encoding = []
-for fn in os.listdir(path):  #fn 表示的是文件名q
-    print(path + "/" + fn)
-    total_face_encoding.append(
-        face_recognition.face_encodings(
-            face_recognition.load_image_file(path + "/" + fn))[0])
-    fn = fn[:(len(fn) - 4)]  #截取图片名（这里应该把images文件中的图片名命名为为人物名）
-    total_image_name.append(fn)  #图片名字列表
-while (1):
-    ret, frame = cap.read()
-    face_locations = face_recognition.face_locations(frame) # 发现在视频帧所有的脸和face_enqcodings
-    face_encodings = face_recognition.face_encodings(frame, face_locations)
-    for (top, right, bottom, left), face_encoding in zip(
-            face_locations, face_encodings):     # 在这个视频帧中循环遍历每个人脸
-        for i, v in enumerate(total_face_encoding):        # 看看面部是否与已知人脸相匹配。
-            match = face_recognition.compare_faces(
-                [v], face_encoding, tolerance=0.5)
-            name = "Unknown"
-            if match[0]:
-                name = total_image_name[i]
-                break
-
-        cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)         # 画出一个框，框住脸
-        cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255),
-                      cv2.FILLED)        # 画出一个带名字的标签，放在框下
-        font = cv2.FONT_HERSHEY_DUPLEX
-        cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0,
-                    (255, 255, 255), 1)
-    cv2.imshow('Video', frame)     # 显示结果图像
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-cap.release()
-cv2.destroyAllWindows()
-```
+![原理](README_files/recognize.jpg)
 **tips:**
 * Face_Recognition
 
@@ -375,187 +228,11 @@ sendEmail(msg)
 
 ![确认为家庭成员](README_files/6.png)
 
-### step9-CNN神经网络（CNNNET）
+### step9-ShuffleNet轻量级模型
 [代码仓库](https://github.com/yuaaaaaa/Raspberry-FaceRecognition-SecurityCamera/blob/main/Project/%E9%99%88%E9%9B%A8%E6%99%B4/model.py)
 
-```python
-import os
-import cv2
-from keras.models import Sequential,load_model
-from keras.layers import Dense,Activation,Convolution2D,MaxPooling2D,Flatten,Dropout
-import numpy as np
-from sklearn.model_selection import train_test_split
-from keras.utils import np_utils
-import random
-
-import numpy as np
-
-import os
-import cv2
-import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
-from keras.utils import np_utils
-import random
-path = "/Users/chenyuqing/Desktop/dataset"
-IMG_SIZE = 128
-#建立一个用于存储和格式化读取训练数据的类
-class DataSet(object):
-    def __init__(self,path):
-        self.num_classes = None
-        self.X_train = None
-        self.X_test = None
-        self.Y_train = None
-        self.Y_test = None
-        self.img_size = 128
-        self.extract_data(path) #在这个类初始化的过程中读取path下的训练数据
-
-    def extract_data(self,path):
-        #根据指定路径读取出图片、标签和类别数
-        labels = []
-        imgs = []
-        names = []
-        count = 0
-        for fn in os.listdir(path):  #fn 表示的是文件名q
-            if fn == '.DS_Store':
-                continue
-            print(path + "/" + fn)
-            img = plt.imread(path + "/" + fn)
-            resized_img = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
-            recolored_img = cv2.cvtColor(resized_img,cv2.COLOR_BGR2GRAY)
-            imgs.append(np.array(recolored_img))
-            fn = fn[:(len(fn) - 4)]  #截取图片名（这里应该把images文件中的图片名命名为为人物名）
-            names.append(fn)  #图片名字列表
-            labels.append(count)
-            count += 1
-        counter = count
-        labels =np.array(labels)
-        imgs = np.array(imgs)
-        #print(imgs)
-        #将数据集打乱随机分组
-        X_train,X_test,y_train,y_test = train_test_split(imgs,labels,test_size=0.2,random_state=random.randint(0, 100))
-
-        #重新格式化和标准化
-        #本案例是基于thano的，如果基于tensorflow的backend需要进行修改
-        print(X_train.shape)
-        X_train = X_train.reshape(X_train.shape[0], 1, self.img_size, self.img_size)/255.0
-        X_test = X_test.reshape(X_test.shape[0], 1, self.img_size, self.img_size) / 255.0
-
-        X_train = X_train.astype('float32')
-        X_test = X_test.astype('float32')
-        
-        #将labels转成 binary class matrices
-        Y_train = np_utils.to_categorical(y_train, num_classes=counter)
-        Y_test = np_utils.to_categorical(y_test, num_classes=counter)
-    
-        #将格式化后的数据赋值给类的属性上
-        self.X_train = X_train
-        self.X_test = X_test
-        self.Y_train = Y_train
-        self.Y_test = Y_test
-        self.num_classes = counter
-
-
-#建立基于CNN的人脸识别模型
-class Model(object):
-    FILE_PATH = "/Users/chenyuqing/大三上/实训/model.h5" 
-    def __init__(self):
-        self.model = None
-        
-    #读取实例化后的Dataset类作为进行训练的数据源
-    def read_trainData(self, dataset):
-        self.dataset = dataset
-        
-    #建立CNN模型，一层卷积，一层池化， 一层卷积，一层池化，名之后进行全连接最后进行分类
-    def build_model(self):
-        self.model = Sequential()
-        self.model.add(
-            Convolution2D(
-                filters=32,
-                kernel_size=(5, 5),
-                padding='same',
-                dim_ordering='th',
-                input_shape=self.dataset.X_train.shape[1:]
-            ))
-        self.model.add(Activation('relu'))
-        self.model.add(
-            MaxPooling2D(
-                pool_size=(2, 2),
-                strides=(2, 2),
-                padding='same'
-            ))
-        
-        
-        self.model.add(
-            Convolution2D(
-                filters=64, 
-                kernel_size=(5, 5),
-                padding='same'
-        ))
-        self.model.add(Activation('relu'))
-        self.model.add(
-            MaxPooling2D(
-                pool_size=(2, 2),
-                strides=(2, 2),
-                padding='same'
-            ))
-        
-        self.model.add(Flatten())
-        self.model.add(Dense(512))
-        self.model.add(Activation('relu'))
-        
-        self.model.add(Dense(self.dataset.num_classes))
-        self.model.add(Activation('softmax'))
-        self.model.summary()
-    
-    #进行模型训练，改变不同optimizer,loss
-    def train_model(self):
-        self.model.compile(
-            optimizer='adam', #RMSprop,Adagrad
-            loss='categorical_crossentropy', #squared_hinge
-            metrics=['accuracy']
-        )
-        #epochs为训练多少轮、batch_size为每次训练多少个样本
-        self.model.fit(self.dataset.X_train, self.dataset.Y_train, epochs=7, batch_size=20)
-      
-    def evaluate_model(self):
-        print('\nTesting---------------')
-        loss, accuracy = self.model.evaluate(self.dataset.X_test, self.dataset.Y_test)
-
-        print('test loss;', loss)
-        print('test accuracy:', accuracy)
-    
-    def save(self, file_path=FILE_PATH):
-        print('Model Saved.')
-        self.model.save(file_path)
-        
-    def load(self, file_path=FILE_PATH):
-        print('Model Loaded.')
-        self.model = load_model(file_path)
-    
-    #需要确保输入的img得是灰化之后（channel =1 )且 大小为IMAGE_SIZE的人脸图片
-    def predict(self,img):
-        img = img.reshape((1, 1, self.IMAGE_SIZE, self.IMAGE_SIZE))
-        img = img.astype('float32')
-        img = img/255.0
-
-        result = self.model.predict_proba(img)  #测算一下该img属于某个label的概率
-        max_index = np.argmax(result) #找出概率最高的
-
-        return max_index,result[0][max_index] #第一个参数为概率最高的label的index,第二个参数为对应概率
-
-if __name__ == '__main__':
-    dataset = DataSet('/Users/chenyuqing/Desktop/dataset')
-    model = Model()
-    model.read_trainData(dataset)
-    model.build_model()
-    model.train_model()
-    model.evaluate_model()
-    model.save()
-    
-        
-```
+![原理](README_files/9.png)
 **tips:**
-![卷积神经网络](README_files/1.png)
 * 基于卷积神经网络完成人脸识别
 
 ## -性能描述
