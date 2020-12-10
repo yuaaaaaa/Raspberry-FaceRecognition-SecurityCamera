@@ -1,7 +1,31 @@
 # -树莓派智能安防摄像头（Smart security camera for home use by Raspberry-Pi）
 ![树莓派](README_files/2.jpg)
 ## -目录（Catalogue）
-![目录](README_files/3.jpg)
+
+- [-描述（Description）](#-描述description)    
+- [-详细功能（detailed function）](#-详细功能detailed-function)    
+- [-为什么使用树莓派（Why Raspberry Pi?）](#-为什么使用树莓派why-raspberry-pi)    
+- [- 如何使用（How to do）](#--如何使用how-to-do)        
+    - [step1-准备工具（tool）](#step1-准备工具tool)        
+    - [step2-配置Raspberry Pi（deploy）](#step2-配置raspberry-pideploy)        
+    - [step3-测试相机（To test the camera）](#step3-测试相机to-test-the-camera)            
+
+        - [1) 现在让我们用树莓派拍一张照片吧~](#1-现在让我们用树莓派拍一张照片吧)            
+        - [2) 现在让我们用一段简单的代码测试一下吧](#2-现在让我们用一段简单的代码测试一下吧)        
+
+    - [step4-移动物体目标检测（Moving object detection）](#step4-移动物体目标检测moving-object-detection)        
+    - [step5-人脸检测（MTCNN）](#step5-人脸检测mtcnn)        
+    - [step6-人脸识别（Face Recognition）](#step6-人脸识别face-recognition)auto        
+    - [step7-定时录像（Regular mail）](#step7-定时录像regular-mail)        
+    - [step8-非家庭成员入侵发邮件报警（Stanger call the police）](#step8-非家庭成员入侵发邮件报警stanger-call-the-police)        
+    - [step9-ShuffleNet轻量级模型](#step9-shufflenet轻量级模型)    
+- [-性能描述](#-性能描述)        
+    - [1）关于移动物体识别](#1关于移动物体识别)        
+    - [2）对于人脸识别](#2对于人脸识别)        
+    - [3）对于邮件发送](#3对于邮件发送)        
+    - [4）对于定时录像](#4对于定时录像)
+
+
 ## -描述（Description）
 		RPi-AI-Camera是一款智能AI摄像头，具有人形侦查预警器。
 		通过识别移动的物体，抓取人脸图像对比家庭成员信息来判别出外人入侵的情况，从而做到邮件预警的功能
@@ -9,6 +33,7 @@
  * 移动物体的追踪定位框选
  * 通过人脸识别技术，对非家庭成员入侵邮件预警预警
  * 实时录像以减轻内存负担
+ * 对摔倒行为发送警告邮件
   
   
   **GitHub仓库：**  [yuaaaaaa/RPi-AI-CAMERA](https://github.com/yuaaaaaa/RPi-AI-CAMERA.git)
