@@ -113,7 +113,7 @@ cv2.destroyAllWindows()
 从而对孔（hole）和缺陷（imperfection）进行归一化处理。
 
 ### step5-人脸检测（MTCNN-多任务卷积神经网络）
-[代码仓库地址](https://github.com/yuaaaaaa/RPi-AI-CAMERA/blob/main/Project/%E9%99%88%E9%9B%A8%E6%99%B4/%E5%9B%BE%E5%83%8F%E4%BA%BA%E8%84%B8%E6%A1%86%E9%80%89.ipynb)
+[代码仓库地址](https://github.com/yuaaaaaa/Raspberry-FaceRecognition-SecurityCamera/blob/main/Project/net/mtcnn.py)
 
 ![原理](README_files/detect.jpg)
 **tips:**
@@ -126,7 +126,7 @@ cv2.destroyAllWindows()
 ### step6-人脸识别（Face Recognition）
 [数据集：该数据集包含了来自500个人的2500张亚洲人脸图片，非限制场景下的人脸识别。提取码：o0ty](http://pan.baidu.com/s/1bpIvkLp)
 
-[代码仓库地址](https://github.com/yuaaaaaa/RPi-AI-CAMERA/blob/main/Project/%E9%99%88%E9%9B%A8%E6%99%B4/%E5%9B%BE%E5%83%8F%E4%BA%BA%E8%84%B8%E6%A3%80%E6%B5%8B.ipynb)
+[代码仓库地址](https://github.com/yuaaaaaa/Raspberry-FaceRecognition-SecurityCamera/blob/main/Project/net/inception.py)
 
 ![原理](README_files/recognize.jpg)
 **tips:**
@@ -256,7 +256,7 @@ sendEmail(msg)
 ![确认为家庭成员](README_files/6.png)
 
 ### step9-ShuffleNet轻量级模型
-[代码仓库](https://github.com/yuaaaaaa/Raspberry-FaceRecognition-SecurityCamera/blob/main/Project/%E9%99%88%E9%9B%A8%E6%99%B4/model.py)
+[代码仓库](https://github.com/yuaaaaaa/Raspberry-FaceRecognition-SecurityCamera/blob/main/Project/net/ShuffleNet2.py)
 
 ![原理](README_files/9.png)
 **tips:**
@@ -265,10 +265,25 @@ sendEmail(msg)
 * Concat ：连接层
 * Channel Shuffle:来增强通道之间的相关性
 
+
+### step9-摔倒识别（canny 边缘检测）
+![效果](README_files/cany.png)
+
+**tips:**
+
+* 使用高斯滤波器，平滑图像，除燥
+* 计算像素点的梯度强度和方向
+* 应用非极大值抑制，消除边缘检测带来的杂散响应
+* 应用双阈值检测来确定真实的边缘 推荐高低阈值比 T2/T1 =3:1 or2:1
+* 通过抑制孤立的弱边缘，来最终完成边缘检测
+* 根据人体比例判断状态：Walking，Falling，Fallen
+
+
+
 ## -性能描述
 
 |             | 移动物体识别 | 人脸识别 | 邮件发送 | 定时录像 | 摔倒识别 |
 |-------------| ---------- | ------- | ------ | ------- | ------- |
 |联想 YOGA i7 8G| 31.27 | 49.98 | 1564.65 | 3732.48 | 78.74 |
-|Raspberry ZeroW| 93.81 | 149.94 | 1428.20 | 22.18 | 298.63 |
+|Raspberry ZeroW| 93.81 | 149.94 | 1428.20 | 22.18 | 198.63 |
 
