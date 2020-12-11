@@ -15,15 +15,12 @@
 
     - [step4-移动物体目标检测（Moving object detection）](#step4-移动物体目标检测moving-object-detection)        
     - [step5-人脸检测（MTCNN）](#step5-人脸检测mtcnn)        
-    - [step6-人脸识别（Face Recognition）](#step6-人脸识别face-recognition)auto        
+    - [step6-人脸识别（Face Recognition）](#step6-人脸识别face-recognition)        
     - [step7-定时录像（Regular mail）](#step7-定时录像regular-mail)        
     - [step8-非家庭成员入侵发邮件报警（Stanger call the police）](#step8-非家庭成员入侵发邮件报警stanger-call-the-police)        
     - [step9-ShuffleNet轻量级模型](#step9-shufflenet轻量级模型)    
 - [-性能描述](#-性能描述)        
-    - [1）关于移动物体识别](#1关于移动物体识别)        
-    - [2）对于人脸识别](#2对于人脸识别)        
-    - [3）对于邮件发送](#3对于邮件发送)        
-    - [4）对于定时录像](#4对于定时录像)
+
 
 
 ## -描述（Description）
@@ -115,21 +112,26 @@ cv2.destroyAllWindows()
 还需要应用阈值来得到一幅黑白图像，并通过下面代码来膨胀（dilate）图像，
 从而对孔（hole）和缺陷（imperfection）进行归一化处理。
 
-### step5-人脸检测（MTCNN）
+### step5-人脸检测（MTCNN-多任务卷积神经网络）
 [代码仓库地址](https://github.com/yuaaaaaa/RPi-AI-CAMERA/blob/main/Project/%E9%99%88%E9%9B%A8%E6%99%B4/%E5%9B%BE%E5%83%8F%E4%BA%BA%E8%84%B8%E6%A1%86%E9%80%89.ipynb)
 
 ![原理](README_files/detect.jpg)
+**tips:**
+
+* P-Net:构造是一个全卷积网络,这一部分的基本思想是使用较为浅层、较为简单的CNN快速生成人脸候选窗口。
+* R-Net:构造是一个卷积神经网络增加了一个全连接层,相对于P-Net更复杂的网络结构来对P-Net生成的可能是人脸区域区域窗口进行进一步选择和调整，从而达到高精度过滤和人脸区域优化的效果。
+
+* O-Net:基本结构是一个较为复杂的卷积神经网络，相对于R-Net来说多了一个卷积层.使用更复杂的网络对模型性能进行优化.
 
 ### step6-人脸识别（Face Recognition）
-[数据集](https://github.com/polarisZhao/awesome-face)
+[数据集：该数据集包含了来自500个人的2500张亚洲人脸图片，非限制场景下的人脸识别。提取码：o0ty](http://pan.baidu.com/s/1bpIvkLp)
 
 [代码仓库地址](https://github.com/yuaaaaaa/RPi-AI-CAMERA/blob/main/Project/%E9%99%88%E9%9B%A8%E6%99%B4/%E5%9B%BE%E5%83%8F%E4%BA%BA%E8%84%B8%E6%A3%80%E6%B5%8B.ipynb)
 
 ![原理](README_files/recognize.jpg)
 **tips:**
-* Face_Recognition
 
-Face_Recognition人脸识别模型是一个具有29个转换层的ResNet(残差网络)。
+* 通过ShuffleNet卷积神经网络将检测到的人脸图像转换为128维人脸特征向量，与标准库内已知家庭人脸进行比对。
 
 ### step7-定时录像（Regular mail）
 [代码仓库地址](https://github.com/yuaaaaaa/RPi-AI-CAMERA/blob/main/Project/%E8%AE%B8%E4%BA%A6%E6%9D%A8/%E5%AE%9E%E7%8E%B0%E5%BD%95%E5%83%8F.ipynb)
@@ -258,31 +260,15 @@ sendEmail(msg)
 
 ![原理](README_files/9.png)
 **tips:**
-* 基于卷积神经网络完成人脸识别
+* GConv :组卷积，减少计算量
+* 3*3 DWConv(S = 2)：步长为2的深度可分离卷积，减少计算量
+* Concat ：连接层
+* Channel Shuffle:来增强通道之间的相关性
 
 ## -性能描述
-### 1）关于移动物体识别
-对于每一帧 计算得到： 
-每处理一帧像素并进行计算 计算机 需要使用```31.26933333333333```毫秒
-每处理一帧像素并进行计算 树莓派 需要使用```93.80799999999999```毫秒
 
-### 2）对于人脸识别
-对于每一帧 计算得到： 
+|             | 移动物体识别 | 人脸识别 | 邮件发送 | 定时录像 | 摔倒识别 |
+|-------------| ---------- | ------- | ------ | ------- | ------- |
+|联想 YOGA i7 8G| 31.27 | 49.98 | 1564.65 | 3732.48 | 78.74 |
+|Raspberry ZeroW| 93.81 | 149.94 | 1428.20 | 22.18 | 298.63 |
 
-每处理一帧像素并进行计算 笔记本 需要使用```49.980711323233333```毫秒
-
-每处理一帧像素并进行计算 树莓派 需要使用```149.94213487503316```毫秒
-
-### 3）对于邮件发送
-对于一封邮件 计算得到：
-
-每发送一封邮件 笔记本 需要使用```1564.6496629999547```毫秒
-
-每发送一封邮件 树莓派 需要使用```1428.1979999999996```毫秒
-
-### 4）对于定时录像
-对于每一次启动该程序
-
-每完整的启动一次该程序 计算机 需要```3732.4840199999016```毫秒
-
-每完整的启动一次该程序 树莓派 需要```22.181```毫秒
